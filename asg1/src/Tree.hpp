@@ -3,6 +3,7 @@
 #include <cmath>
 
 #define SCAPEGOAT
+
 namespace DM852 {
 class Tree {
 	class Node {
@@ -127,6 +128,7 @@ public:
 			} else {
 				parent_backup->right = rebuild;
 			}
+			rebuild->parent = parent_backup;
 		}
 #endif
 	}
