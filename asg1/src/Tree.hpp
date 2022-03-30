@@ -109,8 +109,8 @@ public:
 				//This isn't a comparison (even though its expensive)
 				rsize = this->NodeSize(
 					this->NodeBrother(
-						oldgoat, //Old
-						scapegoat //Current
+						scapegoat,
+						oldgoat
 					)
 				);
 
