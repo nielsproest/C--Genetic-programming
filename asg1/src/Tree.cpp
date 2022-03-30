@@ -7,6 +7,7 @@ class Tree {
 	public:
 		const int key;
 		std::string value;
+		//Parent pointers are bad m'kay
 		Node* parent;
 		Node* left;
 		Node* right;
@@ -168,6 +169,26 @@ public:
 		return x;
 	}
 	const Node *end() const {
+		return nullptr;
+	}
+	std::string &front() {
+		return this->begin()->value;
+	}
+	std::string &back() {
+		Node* x = this->root;
+		while (x->right != nullptr) {
+			x = x->right;
+		}
+		return x->value;
+	}
+	Node *begin() {
+		Node* x = this->root;
+		while (x->left != nullptr) {
+			x = x->left;
+		}
+		return x;
+	}
+	Node *end() {
 		return nullptr;
 	}
 private:
