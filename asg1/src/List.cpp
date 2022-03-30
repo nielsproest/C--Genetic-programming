@@ -92,8 +92,8 @@ public:
 		if (last == nullptr) {
 			return;
 		} else if (last == this->head) {
-			this->head == nullptr;
-			this->tail == nullptr;
+			this->head = nullptr;
+			this->tail = nullptr;
 		} else {
 			last->prev->next = nullptr;
 			this->tail = last->prev;
