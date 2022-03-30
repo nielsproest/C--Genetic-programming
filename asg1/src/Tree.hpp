@@ -4,6 +4,22 @@
 
 #define SCAPEGOAT
 
+//Swaps n's parent's pointer for r
+//	n's parent must be calculated before r
+//	so this must a macro.
+//	(inlines arent real)
+#define PSWAP(n,r) {						\
+		if (n->parent != nullptr) {			\
+			if (n->parent->left == n) {		\
+					n->parent->left = r;	\
+				} else {					\
+					n->parent->right = r;	\
+				}							\
+			} else {						\
+				this->root = r;				\
+			}								\
+		}
+
 namespace DM852 {
 class Tree {
 	class Node {
@@ -116,7 +132,6 @@ public:
 
 				tsize = rsize + lsize + 1;
 			} while (lsize <= this->alpha*(tsize-1) && rsize <= this->alpha*(tsize-1));
-			//tsize++; //Count parent
 
 			Node* parent_backup = scapegoat->parent;
 			Node* rebuild = this->RebuildTree(scapegoat, tsize);
@@ -215,7 +230,7 @@ public:
 		this->ScapegoatRemove();
 	}
 	void erase(Node* node) {
-		this->pswap(node, this->DeleteNode(this->root, node->key));
+		PSWAP(node, this->DeleteNode(node, node->key));
 		this->n--;
 		this->ScapegoatRemove();
 	}
@@ -278,6 +293,14 @@ private:
 		Node* s = this->BuildTree(std::floor(val), r->right); 
 		r->right = s->left;
 		s->left = r;
+
+		if (r->right != nullptr) {
+			r->right->parent = r;
+		}
+		if (s->left != nullptr) {
+			s->left->parent = s;
+		}
+
 		return s;
 	}
 	Node* RebuildTree(Node* root, int n) {
@@ -309,20 +332,6 @@ private:
 		return parent->right == x ? parent->left : parent->right;
 	}
 #endif
-
-	//Swaps n's parent's pointer for r
-	void pswap(Node* n, Node* r) {
-		if (n->parent != nullptr) {
-			if (n->parent->left == n) {
-				n->parent->left = r;
-			} else {
-				n->parent->right = r;
-			}
-		} else {
-			this->root = r;
-		}
-		r->parent = n->parent;
-	}
 	//Swaps n1 and n2
 	void swap(Node* n1, Node* n2) {
 		Node* n1left = n1->left;
@@ -335,8 +344,8 @@ private:
 		n2->left = n1left;
 		n2->right = n2right;
 
-		this->pswap(n1, n2);
-		this->pswap(n2, n1);
+		PSWAP(n1, n2);
+		PSWAP(n2, n1);
 	}
 	//Big and heavy function
 	Node* DeleteNode(Node* x, int searchKey) {
