@@ -1,6 +1,7 @@
 
 #include <iostream>
 
+namespace DM852 {
 class List {
 public:
 	//Internal node class
@@ -88,7 +89,9 @@ public:
 	void pop_back() {
 		Node* last = this->tail;
 		
-		if (last == this->head) {
+		if (last == nullptr) {
+			return;
+		} else if (last == this->head) {
 			this->head == nullptr;
 			this->tail == nullptr;
 		} else {
@@ -125,4 +128,21 @@ public:
 	const Node *end() const {
 		return nullptr;
 	}
+	std::string &front() {
+		return this->tail->data;
+	}
+	std::string &back() {
+		return this->head->data;
+	}
+	Node *begin() {
+		return this->head;
+	}
+	Node *end() {
+		return nullptr;
+	}
 };
+}
+
+int main() {
+	return 0;
+}
