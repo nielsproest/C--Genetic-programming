@@ -144,6 +144,10 @@ public:
 		this->alpha = 0.65;
 #endif
 	}
+	/*
+	 * Runtime of O(n)
+	 * Delete this tree
+	 */
 	~Tree() {
 		this->clear();
 	}
