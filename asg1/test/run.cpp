@@ -131,9 +131,11 @@ void bst_default() {
 int main() {
 	std::cout << "Hello" << std::endl;
 
+	//Double linked list
 	dlst_test();
 	dlst_stress();
 	dlst_default();
+	//Scapegoat tree tests
 	bst_test();
 	bst_stress();
 	bst_default();

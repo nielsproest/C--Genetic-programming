@@ -377,7 +377,7 @@ private:
 	}
 	/*
 	 * Runs in O(log n) amortized cost
-	 * Perfectly rebuilds a tree
+	 * Perfectly rebuilds a tree with black magic
 	 */
 	Node* BuildTree(int n, Node* x) {
 		if (n == 0) {
