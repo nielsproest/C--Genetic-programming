@@ -53,6 +53,17 @@ void dlst_stress() {
 	lst.clear();
 	assert(lst.empty());
 }
+void dlst_default() {
+	DM852::List lst, c;
+	lst.push_back("BLOOD");
+	lst.push_back("SHED");
+
+	c = lst;
+	assert(c.begin()->data == "BLOOD");
+	assert(c.begin()->next->data == "SHED");
+
+	assert(&lst != &c);
+}
 
 void bst_test() {
 	DM852::Tree lst;
@@ -105,13 +116,28 @@ void bst_stress() {
 	lst.clear();
 	assert(lst.empty());
 }
+void bst_default() {
+	DM852::Tree lst, c;
+	lst.insert(0,"BLOOD");
+	lst.insert(1,"SHED");
+
+	c = lst;
+	assert(c.begin()->value == "BLOOD");
+	assert(c.begin()->next()->value == "SHED");
+
+	assert(&lst != &c);
+}
 
 int main() {
 	std::cout << "Hello" << std::endl;
+
 	dlst_test();
 	dlst_stress();
+	dlst_default();
 	bst_test();
 	bst_stress();
+	bst_default();
+
 	std::cout << "Bye" << std::endl;
 	return 0;
 }

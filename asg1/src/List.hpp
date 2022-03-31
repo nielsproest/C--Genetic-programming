@@ -1,5 +1,17 @@
-
 #include <iostream>
+#include <cassert>
+
+/*
+TODO: It must be a Regular type, i.e., be DefaultConstructible, Copyable, and EqualityComparable.
+
+It must additionally have the following member functions. 
+Some of them have pre-conditions, 
+which you must document as a comment at the function declaration in the header file. 
+Similarly, if a member func- tion does not run in constant time (ignoring memory allocation), 
+you must document the computational complexity. 
+If you have considered an alternative implementation to achieve a different computational complexity, 
+rite a short note about it as well.
+*/
 
 namespace DM852 {
 class List {
@@ -33,6 +45,38 @@ public:
 	~List() {
 		this->clear();
 	}
+
+	List& operator=(const List& other) {
+		const Node* start = other.begin();
+		this->clear();
+
+		while (start != nullptr) {
+			this->push_back(start->data);
+			start = start->next;
+		}
+
+		return *this;
+	}
+	bool operator==(const List& other) {
+		if (this->size() != other.size()) {
+			return false;
+		}
+
+		const Node* f = this->begin();
+		const Node* g = other.begin();
+
+		while (
+			f != nullptr && 
+			g != nullptr &&
+			f->data == g->data
+		) {
+			f = f->next;
+			g = g->next;
+		}
+
+		return f == nullptr && g == nullptr;
+	}
+
 	int size() const {
 		return this->n;
 	}
@@ -75,6 +119,7 @@ public:
 	}
 	void clear() {
 		Node* old = this->head;
+
 		while (old != nullptr) {
 			Node* next = old->next;
 			delete old;
@@ -116,9 +161,11 @@ public:
 		this->n--;
 	}
 	const std::string &front() const {
+		assert(this->tail != nullptr);
 		return this->tail->data;
 	}
 	const std::string &back() const {
+		assert(this->head != nullptr);
 		return this->head->data;
 	}
 	const Node *begin() const {
@@ -128,9 +175,11 @@ public:
 		return nullptr;
 	}
 	std::string &front() {
+		assert(this->tail != nullptr);
 		return this->tail->data;
 	}
 	std::string &back() {
+		assert(this->head != nullptr);
 		return this->head->data;
 	}
 	Node *begin() {

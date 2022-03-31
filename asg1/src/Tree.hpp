@@ -1,6 +1,19 @@
 #include <iostream>
 #include <utility>
 #include <cmath>
+#include <cassert>
+
+/*
+TODO: It must be a Regular type, i.e., be DefaultConstructible, Copyable, and EqualityComparable.
+
+It must additionally have the following member functions. 
+Some of them have pre-conditions, 
+which you must document as a comment at the function declaration in the header file. 
+Similarly, if a member func- tion does not run in constant time (ignoring memory allocation), 
+you must document the computational complexity. 
+If you have considered an alternative implementation to achieve a different computational complexity, 
+rite a short note about it as well.
+*/
 
 #define SCAPEGOAT
 
@@ -37,7 +50,24 @@ public:
 			this->left = nullptr;
 			this->right = nullptr;
 		}
+		
+		Node* clone(Node* parent) {
+			Node* me = new Node(this->key, this->value);
 
+			me->parent = parent;
+			if (this->left != nullptr) {
+				me->left = this->left->clone(this);
+			}
+			if (this->right != nullptr) {
+				me->right = this->right->clone(this);
+			}
+
+			return me;
+		}
+
+		/*
+		 * Uses navigates the tree to a worst case of O(log n)
+		*/
 		const Node *next() const {
 			if (this->right != nullptr) {
 				return InorderSuccessor(this->right);
@@ -104,6 +134,32 @@ public:
 	}
 	~Tree() {
 		this->clear();
+	}
+
+	Tree& operator=(const Tree& other) {
+		this->clear();
+		this->root = other.root->clone(nullptr);
+		return *this;
+	}
+	bool operator==(const Tree& other) {
+		if (this->size() != other.size()) {
+			return false;
+		}
+
+		const Node* f = this->begin();
+		const Node* g = other.begin();
+
+		while (
+			f != nullptr && 
+			g != nullptr && 
+			f->key == g->key &&
+			f->value == g->value
+		) {
+			f = f->next();
+			g = g->next();
+		}
+
+		return f == nullptr && g == nullptr;
 	}
 
 	int size() const {
@@ -181,19 +237,23 @@ public:
 		this->n--;
 		this->ScapegoatRemove();
 	}
-	void erase(Node* node) {
-		CSWAP(node, this->DeleteNode(node, node->key));
+	void erase(const Node* node) {
+		Node* x = (Node*)node; //Jakob will love this :)
+		CSWAP(x, this->DeleteNode(x, x->key));
 		this->n--;
 		this->ScapegoatRemove();
 	}
 	const std::string &front() const {
-		return this->begin()->value;
+		const Node* x = this->begin();
+		assert(x != nullptr);
+		return x->value;
 	}
 	const std::string &back() const {
 		Node* x = this->root;
 		while (x->right != nullptr) {
 			x = x->right;
 		}
+		assert(x != nullptr);
 		return x->value;
 	}
 	const Node *begin() const {
@@ -207,13 +267,16 @@ public:
 		return nullptr;
 	}
 	std::string &front() {
-		return this->begin()->value;
+		Node* x = this->begin();
+		assert(x != nullptr);
+		return x->value;
 	}
 	std::string &back() {
 		Node* x = this->root;
 		while (x->right != nullptr) {
 			x = x->right;
 		}
+		assert(x != nullptr);
 		return x->value;
 	}
 	Node *begin() {
