@@ -46,6 +46,10 @@ public:
 		this->clear();
 	}
 
+	/*
+	 * Runtime of O(n)
+	 * Expects a valid list
+	 */
 	List& operator=(const List& other) {
 		const Node* start = other.begin();
 		this->clear();
@@ -57,6 +61,10 @@ public:
 
 		return *this;
 	}
+	/*
+	 * Worst case Runtime of O(n)
+	 * Expects a valid list
+	 */
 	bool operator==(const List& other) {
 		if (this->size() != other.size()) {
 			return false;
@@ -77,12 +85,21 @@ public:
 		return f == nullptr && g == nullptr;
 	}
 
+	/*
+	 * Returns size
+	 */
 	int size() const {
 		return this->n;
 	}
+	/*
+	 * Checks if empty
+	 */
 	bool empty() const {
 		return this->n == 0;
 	}
+	/*
+	 * Adds an element to the end
+	 */
 	void push_back(const std::string &elem) {
 		Node* p = new Node(elem);
 
@@ -98,6 +115,9 @@ public:
 		last->next = p;
 		this->tail = p;
 	}
+	/*
+	 * Adds an element behind a node
+	 */
 	Node* insert(Node* node, const std::string &elem) {
 		Node* p = new Node(elem);
 		p->next = node;
@@ -117,6 +137,10 @@ public:
 		this->n++;
 		return p;
 	}
+	/*
+	 * Runtime of O(n)
+	 * Deletes all nodes
+	 */
 	void clear() {
 		Node* old = this->head;
 
@@ -130,6 +154,9 @@ public:
 		this->head = nullptr;
 		this->tail = nullptr;
 	}
+	/*
+	 * Deletes last nodes
+	 */
 	void pop_back() {
 		Node* last = this->tail;
 		
@@ -146,6 +173,9 @@ public:
 		delete last;
 		this->n--;
 	}
+	/*
+	 * Deletes a nodes
+	 */
 	void erase(Node* node) {
 		if (node->next != nullptr) {
 			node->next->prev = node->prev;
@@ -160,21 +190,21 @@ public:
 		delete node;
 		this->n--;
 	}
+	/*
+	 * Returns the data from the first element
+	 */
 	const std::string &front() const {
-		assert(this->tail != nullptr);
-		return this->tail->data;
-	}
-	const std::string &back() const {
 		assert(this->head != nullptr);
 		return this->head->data;
 	}
-	const Node *begin() const {
-		return this->head;
-	}
-	const Node *end() const {
-		return nullptr;
-	}
 	std::string &front() {
+		assert(this->tail != nullptr);
+		return this->tail->data;
+	}
+	/*
+	 * Returns the data from the last element
+	 */
+	const std::string &back() const {
 		assert(this->tail != nullptr);
 		return this->tail->data;
 	}
@@ -182,8 +212,20 @@ public:
 		assert(this->head != nullptr);
 		return this->head->data;
 	}
+	/*
+	 * Returns the first element
+	 */
+	const Node *begin() const {
+		return this->head;
+	}
 	Node *begin() {
 		return this->head;
+	}
+	/*
+	 * Returns nullptr
+	 */
+	const Node *end() const {
+		return nullptr;
 	}
 	Node *end() {
 		return nullptr;

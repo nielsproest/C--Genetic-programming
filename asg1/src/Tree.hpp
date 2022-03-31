@@ -17,10 +17,13 @@ rite a short note about it as well.
 
 #define SCAPEGOAT
 
-//Swaps n's parent's pointer for r
-//	n's parent must be calculated before r
-//	so this must a macro.
-//	(inlines arent real)
+/*
+ * Swaps n's parent's pointer for r
+ *	n's parent must be calculated before r
+ *	so this must a macro.
+ *	(inlines arent real)
+ *	(jakob loves macro's :)
+ */
 #define CSWAP(n,r) {						\
 		if (n->parent != nullptr) {			\
 			if (n->parent->left == n) {		\
@@ -51,6 +54,10 @@ public:
 			this->right = nullptr;
 		}
 		
+		/*
+		 * Runtime of O(n)
+		 * Clones this node and its children
+		 */
 		Node* clone(Node* parent) {
 			Node* me = new Node(this->key, this->value);
 
@@ -66,8 +73,9 @@ public:
 		}
 
 		/*
-		 * Uses navigates the tree to a worst case of O(log n)
-		*/
+		 * Runtime of O(log n)
+		 * Navigates to the next node
+		 */
 		const Node *next() const {
 			if (this->right != nullptr) {
 				return InorderSuccessor(this->right);
@@ -78,7 +86,7 @@ public:
 				}
 				return x;
 			}
-		} 
+		}
 		Node *next() {
 			if (this->right != nullptr) {
 				return InorderSuccessor(this->right);
@@ -90,6 +98,10 @@ public:
 				return x;
 			}
 		}
+		/*
+		 * Runtime of O(log n)
+		 * Navigates to the previous node
+		 */
 		const Node *prev() const {
 			if (this->left != nullptr) {
 				return InorderPredecessor(this->left);
@@ -136,11 +148,19 @@ public:
 		this->clear();
 	}
 
+	/*
+	 * Runtime of O(n)
+	 * Copies the tree 
+	 */
 	Tree& operator=(const Tree& other) {
 		this->clear();
 		this->root = other.root->clone(nullptr);
 		return *this;
 	}
+	/*
+	 * Worstcase Runtime of O(n)
+	 * Checks equality 
+	 */
 	bool operator==(const Tree& other) {
 		if (this->size() != other.size()) {
 			return false;
@@ -162,12 +182,22 @@ public:
 		return f == nullptr && g == nullptr;
 	}
 
+	/*
+	 * Return size of tree
+	 */
 	int size() const {
 		return this->n;
 	}
+	/*
+	 * Returns if tree is empty
+	 */
 	bool empty() const {
 		return this->n == 0;
 	}
+	/*
+	 * Runs in O(log n) amortized cost (per Galperin and Rivest)
+	 * Inserts an element
+	 */
 	std::pair<Node*, bool> insert(int key, const std::string &value) {
 		Node* x = this->root;
 		Node* y = nullptr;
@@ -209,6 +239,10 @@ public:
 		this->ScapegoatAdd(z, depth);
 		return std::make_pair(z, true);
 	}
+	/*
+	 * Runs in O(log n)
+	 * Finds an element
+	 */
 	const Node *find(int key) const {
 		Node* x = this->root;
 
@@ -223,6 +257,10 @@ public:
 
 		return x;
 	}
+	/*
+	 * Runs in O(n)
+	 * Removes all elements
+	 */
 	void clear() {
 		auto remove = [] (Node* x) { delete x; };
 		this->PostorderTraversal(this->root, remove);
@@ -232,42 +270,50 @@ public:
 		this->maxsize = 0;
 #endif
 	}
+	/*
+	 * Runs in O(log n) amortized cost 
+	 * Removes an element
+	 */
 	void erase(int key) {
-		this->root = this->DeleteNode(this->root, key);
-		this->n--;
-		this->ScapegoatRemove();
+		bool found = false;
+		this->root = this->DeleteNode(this->root, key, &found);
+		if (found) {
+			this->n--;
+			this->ScapegoatRemove();
+		}
 	}
 	void erase(const Node* node) {
-		Node* x = (Node*)node; //Jakob will love this :)
-		CSWAP(x, this->DeleteNode(x, x->key));
+		bool useless;
+		Node* x = (Node*)node; //Endorsed by Jakob
+		CSWAP(x, this->DeleteNode(x, x->key, &useless));
 		this->n--;
 		this->ScapegoatRemove();
 	}
+	/*
+	 * Runs in O(log n)
+	 * Returns the smallest element's value
+	 * Expects a non-empty tree
+	 */
 	const std::string &front() const {
 		const Node* x = this->begin();
 		assert(x != nullptr);
 		return x->value;
 	}
+	std::string &front() {
+		Node* x = this->begin();
+		assert(x != nullptr);
+		return x->value;
+	}
+	/*
+	 * Runs in O(log n)
+	 * Returns the biggest element's value
+	 * Expects a non-empty tree
+	 */
 	const std::string &back() const {
 		Node* x = this->root;
 		while (x->right != nullptr) {
 			x = x->right;
 		}
-		assert(x != nullptr);
-		return x->value;
-	}
-	const Node *begin() const {
-		Node* x = this->root;
-		while (x->left != nullptr) {
-			x = x->left;
-		}
-		return x;
-	}
-	const Node *end() const {
-		return nullptr;
-	}
-	std::string &front() {
-		Node* x = this->begin();
 		assert(x != nullptr);
 		return x->value;
 	}
@@ -279,6 +325,17 @@ public:
 		assert(x != nullptr);
 		return x->value;
 	}
+	/*
+	 * Runs in O(log n)
+	 * Returns the smallest element
+	 */
+	const Node *begin() const {
+		Node* x = this->root;
+		while (x->left != nullptr) {
+			x = x->left;
+		}
+		return x;
+	}
 	Node *begin() {
 		Node* x = this->root;
 		while (x->left != nullptr) {
@@ -286,9 +343,18 @@ public:
 		}
 		return x;
 	}
+	/*
+	 * Returns nullptr
+	 */
+	const Node *end() const {
+		return nullptr;
+	}
 	Node *end() {
 		return nullptr;
 	}
+	/*
+	 * Sets the alpha value for a scapegoat tree
+	 */
 	void setalpha(double a) {
 #ifdef SCAPEGOAT
 		if (0.5 >= a || a > 1) {
@@ -298,6 +364,10 @@ public:
 	}
 private:
 #ifdef SCAPEGOAT
+	/*
+	 * Runs in O(n)
+	 * Turns the tree into a chain
+	 */
 	Node* Flatten(Node* x, Node* y) {
 		if (x == nullptr) {
 			return y;
@@ -305,6 +375,10 @@ private:
 		x->right = this->Flatten(x->right, y);
 		return this->Flatten(x->left, x);
 	}
+	/*
+	 * Runs in O(log n) amortized cost
+	 * Perfectly rebuilds a tree
+	 */
 	Node* BuildTree(int n, Node* x) {
 		if (n == 0) {
 			x->left = nullptr;
@@ -325,6 +399,10 @@ private:
 
 		return s;
 	}
+	/*
+	 * Runs in O(log n) amortized cost
+	 * Perfectly rebuilds a tree
+	 */
 	Node* RebuildTree(Node* root, int n) {
 		Node* w = new Node(-1, "");
 		Node* z = this->Flatten(root, w);
@@ -334,9 +412,15 @@ private:
 		return wleft;
 	}
 	//Calculations
+	/*
+	 * Used to determine if tree is unbalanced
+	 */
 	double AlphaHeightBalance(int s) {
 		return std::floor(std::log2(s) / std::log2(1.0/this->alpha));
 	}
+	/*
+	 * Returns the size of this node
+	 */
 	int NodeSize(Node* x) {
 		if (x == nullptr) {
 			return 0;
@@ -345,7 +429,9 @@ private:
 		}
 	}
 
-	//Binary tree operations
+	/*
+	 * Returns the brother of this node
+	 */
 	Node* NodeBrother(Node* parent, Node* x) {
 		if (parent == nullptr) {
 			return nullptr;
@@ -354,6 +440,11 @@ private:
 		return parent->right == x ? parent->left : parent->right;
 	}
 #endif
+	/*
+	 * Runs in O(log n) amortized cost
+	 * Determines if this tree should be rebuilt, 
+	 * and rebuilds it.
+	 */
 	void ScapegoatAdd(Node* y, int depth) {
 #ifdef SCAPEGOAT
 		this->maxsize = std::max(this->n, this->maxsize);
@@ -394,6 +485,11 @@ private:
 		}
 #endif
 	}
+	/*
+	 * Runs in O(log n) amortized cost
+	 * Determines if this tree should be rebuilt, 
+	 * and rebuilds it.
+	 */
 	void ScapegoatRemove() {
 #ifdef SCAPEGOAT
 		if (this->n < this->alpha * this->maxsize) {
@@ -402,7 +498,10 @@ private:
 		}
 #endif
 	}
-	//Swaps n1 and n2
+	//Binary tree operations
+	/*
+	 * Swaps n1 and n2
+	 */
 	void swap(Node* n1, Node* n2) {
 		Node* n1left = n1->left;
 		Node* n1right = n1->right;
@@ -423,17 +522,21 @@ private:
 		n1->parent = n2parent;
 		n2->parent = n1parent;
 	}
-	//Big and heavy function
-	Node* DeleteNode(Node* x, int searchKey) {
+	/*
+	 * Runs in O(log n)
+	 * Deletes said node
+	 */
+	Node* DeleteNode(Node* x, int searchKey, bool* found) {
 		if (x == nullptr) {
 			return nullptr;
 		}
 
 		if (x->key < searchKey) {
-			x->right = this->DeleteNode(x->right, searchKey);
+			x->right = this->DeleteNode(x->right, searchKey, found);
 		} else if (x->key > searchKey) {
-			x->left = this->DeleteNode(x->left, searchKey);
+			x->left = this->DeleteNode(x->left, searchKey, found);
 		} else {
+			*found = true;
 			if (x->right == nullptr && x->left == nullptr) {
 				delete x;
 				return nullptr;
@@ -450,12 +553,16 @@ private:
 			} else {
 				Node* min_but_bigger = this->InorderSuccessor(x->right);
 				this->swap(min_but_bigger, x);
-				x->right = this->DeleteNode(x->right, x->key);
+				x->right = this->DeleteNode(x->right, x->key, found);
 			}
 		}
 
 		return x;
 	}
+	/*
+	 * Runs in O(log n)
+	 * Finds the smallest value from this node
+	 */
 	static Node* InorderSuccessor(Node* x) {
 		Node* min = x;
 		while (min->left != nullptr) {
@@ -463,6 +570,10 @@ private:
 		}
 		return min;
 	}
+	/*
+	 * Runs in O(log n)
+	 * Finds the biggest value from this node
+	 */
 	static Node* InorderPredecessor(Node* x) {
 		Node* max = x;
 		while (max->right != nullptr) {
@@ -471,7 +582,10 @@ private:
 		return max;
 	}
 
-	//In-order Traversal
+	/*
+	 * Runs in O(n)
+	 * In-order Traversal
+	 */
 	template<typename K>
 	void InorderTraversal(Node* x, K&& func) {
 		if (x == nullptr) {
@@ -482,7 +596,10 @@ private:
 		func(x);
 		this->InorderTraversal(x->right, func);
 	}
-	//Post-order traversal of tree
+	/*
+	 * Runs in O(n)
+	 * Post-order Traversal
+	 */
 	template<typename K>
 	void PostorderTraversal(Node* x, K&& func) {
 		if (x == nullptr) {
