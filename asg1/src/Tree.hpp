@@ -8,7 +8,7 @@
 //	n's parent must be calculated before r
 //	so this must a macro.
 //	(inlines arent real)
-#define PSWAP(n,r) {						\
+#define CSWAP(n,r) {						\
 		if (n->parent != nullptr) {			\
 			if (n->parent->left == n) {		\
 					n->parent->left = r;	\
@@ -22,6 +22,7 @@
 
 namespace DM852 {
 class Tree {
+public:
 	class Node {
 	public:
 		const int key;
@@ -31,14 +32,18 @@ class Tree {
 		Node* left;
 		Node* right;
 
-		Node(int k) : key(k) {}
+		Node(int k, std::string d) : value(d), key(k) {
+			this->parent = nullptr;
+			this->left = nullptr;
+			this->right = nullptr;
+		}
 
 		const Node *next() const {
 			if (this->right != nullptr) {
 				return InorderSuccessor(this->right);
 			} else {
 				const Node* x = this;
-				while (x->key <= this->key) {
+				while (x != nullptr && x->key <= this->key) {
 					x = x->parent;
 				}
 				return x;
@@ -49,7 +54,7 @@ class Tree {
 				return InorderSuccessor(this->right);
 			} else {
 				Node* x = this;
-				while (x->key <= this->key) {
+				while (x != nullptr && x->key <= this->key) {
 					x = x->parent;
 				}
 				return x;
@@ -60,7 +65,7 @@ class Tree {
 				return InorderPredecessor(this->left);
 			} else {
 				const Node* x = this;
-				while (x->key >= this->key) {
+				while (x != nullptr && x->key >= this->key) {
 					x = x->parent;
 				}
 				return x;
@@ -71,7 +76,7 @@ class Tree {
 				return InorderPredecessor(this->left);
 			} else {
 				Node* x = this;
-				while (x->key >= this->key) {
+				while (x != nullptr && x->key >= this->key) {
 					x = x->parent;
 				}
 				return x;
@@ -107,54 +112,6 @@ public:
 	bool empty() const {
 		return this->n == 0;
 	}
-	void ScapegoatAdd(Node* y, int depth) {
-#ifdef SCAPEGOAT
-		this->maxsize = std::max(this->n, this->maxsize);
-
-		Node* scapegoat = y;
-		if (depth > this->AlphaHeightBalance(this->n + 1)) {
-			int tsize = 0;
-			int rsize = 0;
-			int lsize = 0;
-
-			do {
-				Node* oldgoat = scapegoat;
-				scapegoat = scapegoat->parent;
-
-				lsize = tsize;
-				//This isn't a comparison (even though its expensive)
-				rsize = this->NodeSize(
-					this->NodeBrother(
-						scapegoat,
-						oldgoat
-					)
-				);
-
-				tsize = rsize + lsize + 1;
-			} while (lsize <= this->alpha*(tsize-1) && rsize <= this->alpha*(tsize-1));
-
-			Node* parent_backup = scapegoat->parent;
-			Node* rebuild = this->RebuildTree(scapegoat, tsize);
-
-			if (parent_backup == nullptr) {
-				this->root = rebuild;
-			} else if (parent_backup->left == scapegoat) {
-				parent_backup->left = rebuild;
-			} else {
-				parent_backup->right = rebuild;
-			}
-			rebuild->parent = parent_backup;
-		}
-#endif
-	}
-	void ScapegoatRemove() {
-#ifdef SCAPEGOAT
-		if (this->n < this->alpha * this->maxsize) {
-			this->root = this->RebuildTree(this->root, this->n);
-			this->maxsize = this->n;
-		}
-#endif
-	}
 	std::pair<Node*, bool> insert(int key, const std::string &value) {
 		Node* x = this->root;
 		Node* y = nullptr;
@@ -167,7 +124,7 @@ public:
 				x = x->left;
 			} else if (key > x->key) {
 				x = x->right;
-			} else {
+			} else { //equal
 				break;
 			}
 			depth++;
@@ -175,13 +132,12 @@ public:
 
 		//Insert
 		this->n++;
-		if (key == y->key) {
+		if (y != nullptr && key == y->key) {
 			y->value = value;
 			return std::make_pair(y, false);
 		}
 
-		Node* z = new Node(key);
-		z->value = value;
+		Node* z = new Node(key, value);
 
 		if (y == nullptr) {
 			this->root = z;
@@ -194,7 +150,7 @@ public:
 			z->parent = y;
 		}
 
-		this->ScapegoatAdd(y, depth);
+		this->ScapegoatAdd(z, depth);
 		return std::make_pair(z, true);
 	}
 	const Node *find(int key) const {
@@ -209,11 +165,7 @@ public:
 			}
 		}
 
-		if (x == nullptr) {
-			return nullptr;
-		} else {
-			return x;
-		}
+		return x;
 	}
 	void clear() {
 		auto remove = [] (Node* x) { delete x; };
@@ -230,7 +182,7 @@ public:
 		this->ScapegoatRemove();
 	}
 	void erase(Node* node) {
-		PSWAP(node, this->DeleteNode(node, node->key));
+		CSWAP(node, this->DeleteNode(node, node->key));
 		this->n--;
 		this->ScapegoatRemove();
 	}
@@ -304,7 +256,7 @@ private:
 		return s;
 	}
 	Node* RebuildTree(Node* root, int n) {
-		Node* w = new Node(-1);
+		Node* w = new Node(-1, "");
 		Node* z = this->Flatten(root, w);
 		this->BuildTree(n,z);
 		Node* wleft = w->left;
@@ -332,20 +284,74 @@ private:
 		return parent->right == x ? parent->left : parent->right;
 	}
 #endif
+	void ScapegoatAdd(Node* y, int depth) {
+#ifdef SCAPEGOAT
+		this->maxsize = std::max(this->n, this->maxsize);
+
+		Node* scapegoat = y;
+		if (depth > this->AlphaHeightBalance(this->n + 1)) {
+			int tsize = 1;
+			int rsize = 0;
+			int lsize = 0;
+
+			do {
+				Node* oldgoat = scapegoat;
+				scapegoat = scapegoat->parent;
+
+				lsize = tsize;
+				//This isn't a comparison (even though its expensive)
+				rsize = this->NodeSize(
+					this->NodeBrother(
+						scapegoat,
+						oldgoat
+					)
+				);
+
+				tsize = rsize + lsize + 1;
+			} while (scapegoat->parent != nullptr && lsize <= this->alpha*(tsize-1) && rsize <= this->alpha*(tsize-1));
+
+			Node* parent_backup = scapegoat->parent;
+			Node* rebuild = this->RebuildTree(scapegoat, tsize);
+
+			if (parent_backup == nullptr) {
+				this->root = rebuild;
+			} else if (parent_backup->left == scapegoat) {
+				parent_backup->left = rebuild;
+			} else {
+				parent_backup->right = rebuild;
+			}
+			rebuild->parent = parent_backup;
+		}
+#endif
+	}
+	void ScapegoatRemove() {
+#ifdef SCAPEGOAT
+		if (this->n < this->alpha * this->maxsize) {
+			this->root = this->RebuildTree(this->root, this->n);
+			this->maxsize = this->n;
+		}
+#endif
+	}
 	//Swaps n1 and n2
 	void swap(Node* n1, Node* n2) {
 		Node* n1left = n1->left;
 		Node* n1right = n1->right;
+		Node* n1parent = n1->parent;
 		Node* n2left = n2->left;
 		Node* n2right = n2->right;
+		Node* n2parent = n2->parent;
 
 		n1->left = n2left;
 		n1->right = n2right;
 		n2->left = n1left;
-		n2->right = n2right;
+		n2->right = n1right;
 
-		PSWAP(n1, n2);
-		PSWAP(n2, n1);
+		CSWAP(n1, n2);
+		CSWAP(n2, n1);
+
+		//Maintaining a parent pointer is a pain
+		n1->parent = n2parent;
+		n2->parent = n1parent;
 	}
 	//Big and heavy function
 	Node* DeleteNode(Node* x, int searchKey) {
@@ -363,17 +369,17 @@ private:
 				return nullptr;
 			} else if (x->right == nullptr) {
 				Node* tmp = x->left;
+				tmp->parent = x->parent;
 				delete x;
 				return tmp;
 			} else if (x->left == nullptr) {
 				Node* tmp = x->right;
+				tmp->parent = x->parent;
 				delete x;
 				return tmp;
 			} else {
 				Node* min_but_bigger = this->InorderSuccessor(x->right);
-				/*x->key = min_but_bigger->key;
-				x->value = min_but_bigger->value;*/
-				this->swap(min_but_bigger, x); //dumb
+				this->swap(min_but_bigger, x);
 				x->right = this->DeleteNode(x->right, x->key);
 			}
 		}

@@ -12,6 +12,10 @@ public:
 		//Next pointer
 		Node* next;
 		Node* prev;
+		Node(std::string d) : data(d) {
+			this->next = nullptr;
+			this->prev = nullptr;
+		}
 	};
 
 private:
@@ -36,11 +40,9 @@ public:
 		return this->n == 0;
 	}
 	void push_back(const std::string &elem) {
-		Node* p = new Node();
-		p->data = elem;
-		p->next = nullptr;
-		p->prev = nullptr;
+		Node* p = new Node(elem);
 
+		this->n++;
 		if (this->head == nullptr) {
 			this->head = p;
 			this->tail = p;
@@ -51,12 +53,9 @@ public:
 		p->prev = last;
 		last->next = p;
 		this->tail = p;
-
-		this->n++;
 	}
 	Node* insert(Node* node, const std::string &elem) {
-		Node* p = new Node();
-		p->data = elem;
+		Node* p = new Node(elem);
 		p->next = node;
 		p->prev = node->prev;
 
