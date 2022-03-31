@@ -226,6 +226,13 @@ public:
 	Node *end() {
 		return nullptr;
 	}
+	void setalpha(double a) {
+#ifdef SCAPEGOAT
+		if (0.5 >= a || a > 1) {
+			this->alpha = a;
+		}
+#endif
+	}
 private:
 #ifdef SCAPEGOAT
 	Node* Flatten(Node* x, Node* y) {
