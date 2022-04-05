@@ -1,3 +1,2 @@
 #!/bin/sh
-#this isnt a real makefile LUL
 g++ -std=gnu++20 run.cpp -fsanitize=leak -fsanitize=address -fsanitize=undefined -o run && ./run
