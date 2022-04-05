@@ -1,0 +1,228 @@
+---
+kind: pipeline
+name: Assignment 1
+
+clone:
+  disable: true
+
+steps:
+- name: clone
+  image: localhost:5000/plugins/git-user
+
+- name: check
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/check.py
+  depends_on:
+  - clone
+
+- name: List API, hpp
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t hpp
+  depends_on:
+  - check
+
+- name: List API, class
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t class
+  depends_on:
+  - check
+
+- name: List API, node
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t node
+  depends_on:
+  - check
+
+- name: List API, regular
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t regular
+  depends_on:
+  - check
+
+- name: List API, size
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t size
+  depends_on:
+  - check
+
+- name: List API, empty
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t empty
+  depends_on:
+  - check
+
+- name: List API, push_back
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t push_back
+  depends_on:
+  - check
+
+- name: List API, insert
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t insert
+  depends_on:
+  - check
+
+- name: List API, clear
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t clear
+  depends_on:
+  - check
+
+- name: List API, pop_back
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t pop_back
+  depends_on:
+  - check
+
+- name: List API, erase
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t erase
+  depends_on:
+  - check
+
+- name: List API, front
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t front
+  depends_on:
+  - check
+
+- name: List API, back
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t back
+  depends_on:
+  - check
+
+- name: List API, begin
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t begin
+  depends_on:
+  - check
+
+- name: List API, end
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_list.py -t end
+  depends_on:
+  - check
+
+- name: Tree API, hpp
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t hpp
+  depends_on:
+  - check
+
+- name: Tree API, class
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t class
+  depends_on:
+  - check
+
+- name: Tree API, node
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t node
+  depends_on:
+  - check
+
+- name: Tree API, prev
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t prev
+  depends_on:
+  - check
+
+- name: Tree API, next
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t next
+  depends_on:
+  - check
+
+- name: Tree API, regular
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t regular
+  depends_on:
+  - check
+
+- name: Tree API, size
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t size
+  depends_on:
+  - check
+
+- name: Tree API, empty
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t empty
+  depends_on:
+  - check
+
+- name: Tree API, insert
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t insert
+  depends_on:
+  - check
+
+- name: Tree API, clear
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t clear
+  depends_on:
+  - check
+
+- name: Tree API, erase
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t erase
+  depends_on:
+  - check
+
+- name: Tree API, front
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t front
+  depends_on:
+  - check
+
+- name: Tree API, back
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t back
+  depends_on:
+  - check
+
+- name: Tree API, begin
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t begin
+  depends_on:
+  - check
+
+- name: Tree API, end
+  image: localhost:5000/dm852
+  commands:
+  - python3 /dm852/test_A1_tree.py -t end
+  depends_on:
+  - check
+
