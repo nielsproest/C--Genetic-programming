@@ -42,6 +42,10 @@ public:
 		this->tail = nullptr;
 		this->n = 0;
 	}
+	/*
+	 * Runtime of O(n)
+	 * Delete this list
+	 */
 	~List() {
 		this->clear();
 	}

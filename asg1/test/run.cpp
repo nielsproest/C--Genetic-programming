@@ -2,6 +2,7 @@
 #include "../src/Tree.hpp"
 #include <cassert>
 
+//Test general functionality
 void dlst_test() {
 	DM852::List lst;
 
@@ -35,6 +36,7 @@ void dlst_test() {
 	lst.clear();
 	assert(lst.empty());
 }
+//Add and read alot of elements
 void dlst_stress() {
 	DM852::List lst;
 
@@ -53,6 +55,7 @@ void dlst_stress() {
 	lst.clear();
 	assert(lst.empty());
 }
+//Test regular type-ness
 void dlst_default() {
 	DM852::List lst, c;
 	lst.push_back("BLOOD");
@@ -65,6 +68,7 @@ void dlst_default() {
 	assert(&lst != &c);
 }
 
+//Test general functionality
 void bst_test() {
 	DM852::Tree lst;
 
@@ -100,6 +104,7 @@ void bst_test() {
 	lst.clear();
 	assert(lst.empty());
 }
+//Add and read alot of elements
 void bst_stress() {
 	DM852::Tree lst;
 
@@ -116,6 +121,7 @@ void bst_stress() {
 	lst.clear();
 	assert(lst.empty());
 }
+//Test regular type-ness
 void bst_default() {
 	DM852::Tree lst, c;
 	lst.insert(0,"BLOOD");

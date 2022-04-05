@@ -315,7 +315,7 @@ public:
 	 */
 	const std::string &back() const {
 		Node* x = this->root;
-		while (x->right != nullptr) {
+		while (x != nullptr && x->right != nullptr) {
 			x = x->right;
 		}
 		assert(x != nullptr);
@@ -323,7 +323,7 @@ public:
 	}
 	std::string &back() {
 		Node* x = this->root;
-		while (x->right != nullptr) {
+		while (x != nullptr && x->right != nullptr) {
 			x = x->right;
 		}
 		assert(x != nullptr);
@@ -335,14 +335,14 @@ public:
 	 */
 	const Node *begin() const {
 		Node* x = this->root;
-		while (x->left != nullptr) {
+		while (x != nullptr && x->left != nullptr) {
 			x = x->left;
 		}
 		return x;
 	}
 	Node *begin() {
 		Node* x = this->root;
-		while (x->left != nullptr) {
+		while (x != nullptr && x->left != nullptr) {
 			x = x->left;
 		}
 		return x;
