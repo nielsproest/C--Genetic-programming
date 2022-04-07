@@ -63,10 +63,10 @@ public:
 
 			me->parent = parent;
 			if (this->left != nullptr) {
-				me->left = this->left->clone(this);
+				me->left = this->left->clone(me);
 			}
 			if (this->right != nullptr) {
-				me->right = this->right->clone(this);
+				me->right = this->right->clone(me);
 			}
 
 			return me;
@@ -159,6 +159,11 @@ public:
 	Tree& operator=(const Tree& other) {
 		this->clear();
 		this->root = other.root->clone(nullptr);
+		this->n = other.n;
+#ifdef SCAPEGOAT
+		this->maxsize = other.maxsize;
+		this->alpha = other.alpha;
+#endif
 		return *this;
 	}
 	/*

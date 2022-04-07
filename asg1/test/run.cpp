@@ -66,6 +66,7 @@ void dlst_default() {
 	assert(c.begin()->next->data == "SHED");
 
 	assert(&lst != &c);
+	assert(lst == c);
 }
 
 //Test general functionality
@@ -132,6 +133,7 @@ void bst_default() {
 	assert(c.begin()->next()->value == "SHED");
 
 	assert(&lst != &c);
+	assert(lst == c);
 }
 
 int main() {
