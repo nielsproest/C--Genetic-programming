@@ -67,6 +67,15 @@ void dlst_default() {
 
 	assert(&lst != &c);
 	assert(lst == c);
+	assert(!(lst != c));
+}
+void dlst_default2() {
+	DM852::List lst;
+	lst.push_back("BLOOD");
+	lst.push_back("SHED");
+	DM852::List c(lst);
+	
+	assert(lst == c);
 }
 
 //Test general functionality
@@ -134,6 +143,15 @@ void bst_default() {
 
 	assert(&lst != &c);
 	assert(lst == c);
+	assert(!(lst != c));
+}
+void bst_default2() {
+	DM852::Tree lst;
+	lst.insert(0,"BLOOD");
+	lst.insert(1,"SHED");
+	DM852::Tree c(lst);
+	
+	assert(lst == c);
 }
 
 int main() {
@@ -143,10 +161,12 @@ int main() {
 	dlst_test();
 	dlst_stress();
 	dlst_default();
+	dlst_default2();
 	//Scapegoat tree tests
 	bst_test();
 	bst_stress();
 	bst_default();
+	bst_default2();
 
 	std::cout << "Bye" << std::endl;
 	return 0;

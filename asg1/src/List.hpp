@@ -42,6 +42,9 @@ public:
 		this->tail = nullptr;
 		this->n = 0;
 	}
+	List(const List& other) {
+		this->operator=(other);
+	}
 	/*
 	 * Runtime of O(n)
 	 * Delete this list
@@ -87,6 +90,9 @@ public:
 		}
 
 		return f == nullptr && g == nullptr;
+	}
+	bool operator!=(const List& other) {
+		return !(operator==(other));
 	}
 
 	/*

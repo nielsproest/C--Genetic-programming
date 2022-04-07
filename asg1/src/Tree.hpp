@@ -144,6 +144,9 @@ public:
 		this->alpha = 0.65;
 #endif
 	}
+	Tree(const Tree& other) {
+		this->operator=(other);
+	}
 	/*
 	 * Runtime of O(n)
 	 * Delete this tree
@@ -189,6 +192,9 @@ public:
 		}
 
 		return f == nullptr && g == nullptr;
+	}
+	bool operator!=(const Tree& other) {
+		return !(operator==(other));
 	}
 
 	/*
