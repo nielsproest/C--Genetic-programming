@@ -1,18 +1,6 @@
 #include <iostream>
 #include <cassert>
 
-/*
-TODO: It must be a Regular type, i.e., be DefaultConstructible, Copyable, and EqualityComparable.
-
-It must additionally have the following member functions. 
-Some of them have pre-conditions, 
-which you must document as a comment at the function declaration in the header file. 
-Similarly, if a member func- tion does not run in constant time (ignoring memory allocation), 
-you must document the computational complexity. 
-If you have considered an alternative implementation to achieve a different computational complexity, 
-rite a short note about it as well.
-*/
-
 namespace DM852 {
 class List {
 public:
