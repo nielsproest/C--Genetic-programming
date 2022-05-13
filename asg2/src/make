@@ -1,0 +1,4 @@
+#!/bin/sh
+clear
+#g++-11 -std=c++20 List.hpp -o List && ./List
+g++ -std=c++20 Tree.cpp -o Tree && ./Tree

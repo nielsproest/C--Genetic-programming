@@ -1,0 +1,4 @@
+#!/bin/sh
+clear
+g++ -std=gnu++20 run.cpp -o run && ./run
+# -fsanitize=leak -fsanitize=address -fsanitize=undefined
