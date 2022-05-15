@@ -335,8 +335,7 @@ public:
 		while (
 			f != fd &&
 			g != gd &&
-			(*f).first == (*g).first &&
-			(*f).second == (*g).second
+			this->c_equal((*f).first, (*g).first)// && (*f).second == (*g).second
 		) {
 			++f;
 			++g;
