@@ -113,7 +113,9 @@ public:
 		}
 
 		//Iterator
-		const_iterator() : c(nullptr), p(nullptr) {}
+		const_iterator() : c(nullptr), p(nullptr) {
+			this->last_action_was_increment = true;
+		}
 		const_iterator(Node* start, Tree<Key, Value, Comp>* parent) : c(start), p(parent) {
 			if (start == nullptr) {
 				this->last_action_was_increment = true;
@@ -204,7 +206,9 @@ public:
 		}
 
 		//Iterator
-		iterator() : c(nullptr), p(nullptr) {}
+		iterator() : c(nullptr), p(nullptr) {
+			this->last_action_was_increment = true;
+		}
 		iterator(Node* start, Tree<Key, Value, Comp>* parent) : c(start), p(parent) {
 			if (start == nullptr) {
 				this->last_action_was_increment = true;
@@ -284,8 +288,8 @@ public:
 	Tree(const Tree&& other) {
 		this->root = other.root->clone(nullptr);
 		this->n = other.n;
-		//no reason to be destructive
-		//other.clear();
+		this->cmp = other.cmp;
+		other.clear();
 	}
 
 	/*
@@ -302,8 +306,8 @@ public:
 	Tree& operator=(const Tree&& other) {
 		this->root = other.root->clone(nullptr);
 		this->n = other.n;
-		//no reason to be destructive
-		//other->clear();
+		this->cmp = other.cmp;
+		other->clear();
 		return *this;
 	}
 
@@ -315,6 +319,7 @@ public:
 		this->clear();
 		this->root = other.root->clone(nullptr);
 		this->n = other.n;
+		this->cmp = other.cmp;
 		return *this;
 	}
 	/*
@@ -376,7 +381,7 @@ public:
 			return InorderSuccessor(work->right);
 		} else {
 			Node* x = work;
-			while (x != nullptr && c_less_or_equal(x->key(), work->key())) {
+			while (x != nullptr && this->c_less_or_equal(x->key(), work->key())) {
 				x = x->parent;
 			}
 			return x;

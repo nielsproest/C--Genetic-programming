@@ -42,10 +42,11 @@ public:
 				return;
 			}
 
-			if (this->c->next != nullptr) {
+			if (this->c != nullptr) {
 				this->c = this->c->next;
-			} else {
-				this->last_action_was_increment = true;
+			}
+			if (this->c == nullptr) {
+				this->last_action_was_increment = false;
 			}
 		}
 		void decrement() {
@@ -56,16 +57,23 @@ public:
 				return;
 			}
 
-			if (this->c->prev != nullptr) {
+			if (this->c != nullptr) {
 				this->c = this->c->prev;
-			} else {
+			}
+			if (this->c == nullptr) {
 				this->last_action_was_increment = false;
 			}
 		}
 
 		//Iterator
-		const_iterator() : c(nullptr), p(nullptr) {}
-		const_iterator(Node* start, const List<T>* parent) : c(start), p(parent) {}
+		const_iterator() : c(nullptr), p(nullptr) {
+			this->last_action_was_increment = true;
+		}
+		const_iterator(Node* start, const List<T>* parent) : c(start), p(parent) {
+			if (start == nullptr) {
+				this->last_action_was_increment = true;
+			}
+		}
 
 		//Required for equality
 		//	struct std::common_reference<DM852::List<int>::iterator&, int&>
@@ -123,10 +131,11 @@ public:
 				return;
 			}
 
-			if (this->c->next != nullptr) {
+			if (this->c != nullptr) {
 				this->c = this->c->next;
-			} else {
-				this->last_action_was_increment = true;
+			}
+			if (this->c == nullptr) {
+				this->last_action_was_increment = false;
 			}
 		}
 		void decrement() {
@@ -137,16 +146,23 @@ public:
 				return;
 			}
 
-			if (this->c->prev != nullptr) {
+			if (this->c != nullptr) {
 				this->c = this->c->prev;
-			} else {
+			}
+			if (this->c == nullptr) {
 				this->last_action_was_increment = false;
 			}
 		}
 
 		//Iterator
-		iterator() : c(nullptr), p(nullptr) {}
-		iterator(Node* start, const List<value_type>* parent) : c(start), p(parent) {}
+		iterator() : c(nullptr), p(nullptr) {
+			this->last_action_was_increment = true;
+		}
+		iterator(Node* start, const List<value_type>* parent) : c(start), p(parent) {
+			if (start == nullptr) {
+				this->last_action_was_increment = true;
+			}
+		}
 
 		// implicit conversion
 		operator const_iterator() const {
