@@ -169,11 +169,11 @@ private:
 	VList vList;
 	EList eList;
 public:
+	//using OutEdgeRange = OutEdgeList;
 	struct OutEdgeRange {
 		std::size_t s;
 		const AdjacencyList& parent;
 
-		OutEdgeRange() {}
 		OutEdgeRange(std::size_t s, const AdjacencyList& parent) : s(s), parent(parent) {}
 		struct iterator;
 		iterator begin() {
@@ -182,9 +182,18 @@ public:
 		iterator end() {
 			return ++iterator(this->parent.vList.at(this->s).eOut, this, 0);
 		}
-		EdgeDescriptor create(std::size_t elst_idx) {
-			VertexDescriptor other = this->parent.eList.at(elst_idx).tar;
-			return EdgeDescriptor(this->s, other, elst_idx);
+		//NOTE: This is bad
+		std::size_t find(OutEdge t) {
+			for (int i=0; i < this->parent.eList.size(); i++) {
+				StoredEdge edge = this->parent.eList.at(i);
+				if (edge.src == this->s && edge.tar == t) {
+					return i;
+				}
+			}
+			return -1;
+		}
+		EdgeDescriptor create(OutEdge other) {
+			return EdgeDescriptor(this->s, other, find(other));
 		}
 
 		struct iterator {
@@ -193,9 +202,9 @@ public:
 			using iterator_category = std::bidirectional_iterator_tag;
 			using difference_type = ptrdiff_t; //incorrect
 		
-			const OutEdgeList& p; //The list we iterate over
-			OutEdgeRange* r; //The parent
-			std::size_t c; //The index
+			const OutEdgeList& p;
+			OutEdgeRange* r;
+			std::size_t c;
 
 			void increment() {
 				this->c = std::min(((std::size_t)c)+1, this->p.size()); //Goes 1 above
@@ -239,11 +248,11 @@ public:
 			}
 			//Dereference
 			reference operator*() {
-				std::size_t e = this->p.at(this->c);
+				OutEdge e = this->p.at(this->c);
 				return this->r->create(e);
 			}
 			reference operator*() const {
-				std::size_t e = this->p.at(this->c);
+				OutEdge e = this->p.at(this->c);
 				return this->r->create(e);
 			}
 		};
@@ -253,7 +262,6 @@ public:
 		std::size_t s;
 		const AdjacencyList& parent;
 
-		InEdgeRange() {}
 		InEdgeRange(std::size_t s, const AdjacencyList& parent) : s(s), parent(parent) {}
 		struct iterator;
 		iterator begin() {
@@ -262,9 +270,18 @@ public:
 		iterator end() {
 			return ++iterator(this->parent.vList.at(this->s).eIn, this, 0);
 		}
-		EdgeDescriptor create(std::size_t elst_idx) {
-			VertexDescriptor other = this->parent.eList.at(elst_idx).src;
-			return EdgeDescriptor(this->s, other, elst_idx);
+		//NOTE: This is still bad
+		std::size_t find(OutEdge t) {
+			for (int i=0; i < this->parent.eList.size(); i++) {
+				StoredEdge edge = this->parent.eList.at(i);
+				if (edge.src == t && edge.tar == this->s) {
+					return i;
+				}
+			}
+			return -1;
+		}
+		EdgeDescriptor create(OutEdge other) {
+			return EdgeDescriptor(other, this->s, find(other));
 		}
 
 		struct iterator {
@@ -319,11 +336,11 @@ public:
 			}
 			//Dereference
 			reference operator*() {
-				std::size_t e = this->p.at(this->c);
+				OutEdge e = this->p.at(this->c);
 				return this->r->create(e);
 			}
 			reference operator*() const {
-				std::size_t e = this->p.at(this->c);
+				OutEdge e = this->p.at(this->c);
 				return this->r->create(e);
 			}
 		};
@@ -416,14 +433,13 @@ public: // MutableGraph
 
 		//Append to edge list
 		g.eList.push_back(e);
-		auto idx = g.eList.size()-1;
 
 		//Add edge to u's outedges
 		std::vector<std::size_t>& ul = g.vList->at(u).eOut;
-		ul.push_back(idx);
+		ul.push_back(v);
 
 		//Return descriptor
-		return EdgeDescriptor(u,v,idx);
+		return EdgeDescriptor(u,v,g.eList.size()-1);
 	}
 	template<typename T, typename A, typename B>
 	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const AdjacencyList<T,A,B> &_g) requires std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
@@ -436,14 +452,13 @@ public: // MutableGraph
 
 		//Append to edge list
 		g.eList.push_back(e);
-		auto idx = g.eList.size()-1;
 
 		//Add edge to u's outedges
 		std::vector<std::size_t>& ul = g.vList->at(u).eOut;
-		ul.push_back(idx);
+		ul.push_back(v);
 
 		//Return descriptor
-		return EdgeDescriptor(u,v,idx);
+		return EdgeDescriptor(u,v,g.eList.size()-1);
 	}
 	template<typename T, typename A, typename B>
 	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, const AdjacencyList<T,A,B> &_g) requires std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
@@ -457,18 +472,17 @@ public: // MutableGraph
 
 		//Append to edge list
 		g.eList.push_back(e);
-		auto idx = g.eList.size()-1;
 
 		//Add edge to u's outedges
 		std::vector<std::size_t>& ul = g.vList.at(u).eOut;
-		ul.push_back(idx);
+		ul.push_back(v);
 
 		//Also add to v's inedges
 		std::vector<std::size_t>& vl = g.vList.at(v).eIn;
-		vl.push_back(idx);
+		vl.push_back(u);
 
 		//Return descriptor
-		return EdgeDescriptor(u,v,idx);
+		return EdgeDescriptor(u,v,g.eList.size()-1);
 	}
 	template<typename T, typename A, typename B>
 	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const AdjacencyList<T,A,B> &_g) requires std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
@@ -481,26 +495,25 @@ public: // MutableGraph
 
 		//Append to edge list
 		g.eList.push_back(e);
-		auto idx = g.eList.size()-1;
 
 		//Add edge to u's outedges
 		std::vector<std::size_t>& ul = g.vList.at(u).eOut;
-		ul.push_back(idx);
+		ul.push_back(v);
 
 		//Also add to v's inedges
 		std::vector<std::size_t>& vl = g.vList.at(v).eIn;
-		vl.push_back(idx);
+		vl.push_back(u);
 
 		//Return descriptor
-		return EdgeDescriptor(u,v,idx);
+		return EdgeDescriptor(u,v,g.eList.size()-1);
 	}
 public: // MutablePropertyGraph
 	// TODO
 public: // PropertyGraph
-	VertexProp& operator[](VertexDescriptor e) {
+	VertexProp& operator[](VertexDescriptor& e) {
 		return vList.at(e).prop;
 	}
-	EdgeProp& operator[](EdgeDescriptor e) {
+	EdgeProp& operator[](EdgeDescriptor& e) {
 		return eList.at(e.src).prop;
 	}
 	const VertexProp& operator[](const VertexDescriptor& e) const {

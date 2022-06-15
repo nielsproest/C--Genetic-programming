@@ -25,7 +25,7 @@ void mutgraph_test(Graph& e) requires graph::MutableGraph<Graph> {
 	addEdge(v5,v6,50,e);
 }
 template<typename Graph>
-void incgraph_test(Graph& e) { // requires graph::IncidenceGraph<Graph> {
+void incgraph_test(Graph& e) { //requires graph::IncidenceGraph<Graph> {
 	std::cout << "incgraph_test" << std::endl;
 	//TODO: Some invalid parameter Range R void in Range
 	for (auto v : vertices(e)) {
@@ -37,6 +37,7 @@ void incgraph_test(Graph& e) { // requires graph::IncidenceGraph<Graph> {
 		}
 	}
 }
+
 template<typename Graph>
 void bigraph_test(Graph& e) { // requires graph::BidirectionalGraph<Graph> {
 	std::cout << "bigraph_test" << std::endl;
@@ -51,7 +52,7 @@ void bigraph_test(Graph& e) { // requires graph::BidirectionalGraph<Graph> {
 }
 
 template<typename Graph>
-void propgraph_test(Graph& e) { // requires graph::PropertyGraph<Graph> {
+void propgraph_test(Graph& e) requires graph::PropertyGraph<Graph> {
 	//TODO: Cannot have const access operator
 	std::cout << "propgraph_test" << std::endl;
 	for (auto v : edges(e)) {
@@ -61,7 +62,7 @@ void propgraph_test(Graph& e) { // requires graph::PropertyGraph<Graph> {
 }
 
 template<typename Graph>
-void mutpropgraph_test(Graph& e) { //requires graph::MutablePropertyGraph<Graph> {
+void mutpropgraph_test(Graph& e) requires graph::MutablePropertyGraph<Graph> {
 	std::cout << "mutpropgraph_test" << std::endl;
 	for (auto v : edges(e)) {
 		std::cout << "edge: " << source(v,e) << std::endl;
