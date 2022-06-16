@@ -383,6 +383,47 @@ public: // MutableGraph
 		//Return index
 		return g.vList.size()-1;
 	}
+	template<typename T, typename A, typename B>
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList<T,A,B> &g) requires std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
+		//Create an edge
+		StoredEdge e;
+		e.src = u;
+		e.tar = v;
+
+		//Append to edge list
+		g.eList.push_back(e);
+		auto idx = g.eList.size()-1;
+
+		//Add edge to u's outedges
+		std::vector<std::size_t>& ul = g.vList->at(u).eOut;
+		ul.push_back(idx);
+
+		//Return descriptor
+		return EdgeDescriptor(u,v,idx);
+	}
+	template<typename T, typename A, typename B>
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList<T,A,B> &g) requires std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
+		//Create an edge
+		StoredEdge e;
+		e.src = u;
+		e.tar = v;
+
+		//Append to edge list
+		g.eList.push_back(e);
+		auto idx = g.eList.size()-1;
+
+		//Add edge to u's outedges
+		std::vector<std::size_t>& ul = g.vList.at(u).eOut;
+		ul.push_back(idx);
+
+		//Also add to v's inedges
+		std::vector<std::size_t>& vl = g.vList.at(v).eIn;
+		vl.push_back(idx);
+
+		//Return descriptor
+		return EdgeDescriptor(u,v,idx);
+	}
+public: // MutablePropertyGraph
 	friend VertexDescriptor addVertex(const VertexProp &prop, AdjacencyList &g) requires (!std::same_as<VertexProp, NoProp>) {
 		//Create an edge
 		StoredVertex e;
@@ -412,24 +453,6 @@ public: // MutableGraph
 		return EdgeDescriptor(u,v,idx);
 	}
 	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList<T,A,B> &g) requires std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
-		//Create an edge
-		StoredEdge e;
-		e.src = u;
-		e.tar = v;
-
-		//Append to edge list
-		g.eList.push_back(e);
-		auto idx = g.eList.size()-1;
-
-		//Add edge to u's outedges
-		std::vector<std::size_t>& ul = g.vList->at(u).eOut;
-		ul.push_back(idx);
-
-		//Return descriptor
-		return EdgeDescriptor(u,v,idx);
-	}
-	template<typename T, typename A, typename B>
 	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, AdjacencyList<T,A,B> &g) requires (!std::same_as<A, NoProp>) && std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
 		//Create an edge
 		StoredEdge e;
@@ -452,40 +475,17 @@ public: // MutableGraph
 		//Return descriptor
 		return EdgeDescriptor(u,v,idx);
 	}
-	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList<T,A,B> &g) requires std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
-		//Create an edge
-		StoredEdge e;
-		e.src = u;
-		e.tar = v;
-
-		//Append to edge list
-		g.eList.push_back(e);
-		auto idx = g.eList.size()-1;
-
-		//Add edge to u's outedges
-		std::vector<std::size_t>& ul = g.vList.at(u).eOut;
-		ul.push_back(idx);
-
-		//Also add to v's inedges
-		std::vector<std::size_t>& vl = g.vList.at(v).eIn;
-		vl.push_back(idx);
-
-		//Return descriptor
-		return EdgeDescriptor(u,v,idx);
-	}
-public: // MutablePropertyGraph
 public: // PropertyGraph
-	VertexProp& operator[](VertexDescriptor e) {
+	VertexProp& operator[](VertexDescriptor e) requires (!std::same_as<VertexProp, NoProp>) {
 		return vList.at(e).prop;
 	}
-	EdgeProp& operator[](EdgeDescriptor e) {
+	EdgeProp& operator[](EdgeDescriptor e) requires (!std::same_as<EdgeProp, NoProp>) {
 		return eList.at(e.src).prop;
 	}
-	const VertexProp& operator[](const VertexDescriptor& e) const {
+	const VertexProp& operator[](const VertexDescriptor& e) const requires (!std::same_as<VertexProp, NoProp>) {
 		return vList.at(e).prop;
 	}
-	const EdgeProp& operator[](const EdgeDescriptor& e) const {
+	const EdgeProp& operator[](const EdgeDescriptor& e) const requires (!std::same_as<EdgeProp, NoProp>) {
 		return eList.at(source(e)).prop;
 	}
 };
