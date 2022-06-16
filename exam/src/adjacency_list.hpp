@@ -383,8 +383,7 @@ public: // MutableGraph
 		//Return index
 		return g.vList.size()-1;
 	}
-	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList<T,A,B> &g) requires std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList &g) requires std::same_as<DirectedCategory, graph::tags::Directed> && std::default_initializable<EdgeProp> {
 		//Create an edge
 		StoredEdge e;
 		e.src = u;
@@ -401,8 +400,7 @@ public: // MutableGraph
 		//Return descriptor
 		return EdgeDescriptor(u,v,idx);
 	}
-	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList<T,A,B> &g) requires std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList &g) requires std::same_as<DirectedCategory, graph::tags::Bidirectional> && std::default_initializable<EdgeProp> {
 		//Create an edge
 		StoredEdge e;
 		e.src = u;
@@ -433,8 +431,7 @@ public: // MutablePropertyGraph
 		//Return index
 		return g.vList.size()-1;
 	}
-	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, AdjacencyList<T,A,B> &g) requires (!std::same_as<A, NoProp>) && std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, AdjacencyList &g) requires (!std::same_as<EdgeProp, NoProp>) && std::same_as<DirectedCategory, graph::tags::Directed> {
 		//Create an edge
 		StoredEdge e;
 		e.src = u;
@@ -452,8 +449,7 @@ public: // MutablePropertyGraph
 		//Return descriptor
 		return EdgeDescriptor(u,v,idx);
 	}
-	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, AdjacencyList<T,A,B> &g) requires (!std::same_as<A, NoProp>) && std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, AdjacencyList &g) requires (!std::same_as<EdgeProp, NoProp>) && std::same_as<DirectedCategory, graph::tags::Bidirectional> {
 		//Create an edge
 		StoredEdge e;
 		e.src = u;
