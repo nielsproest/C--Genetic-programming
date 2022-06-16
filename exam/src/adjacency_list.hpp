@@ -23,12 +23,13 @@ public:
 private:
 	using OutEdge = std::size_t;
 	using OutEdgeList = std::vector<OutEdge>;
+	using InEdgeList = OutEdgeList;
 
 	struct StoredVertexSimple {
 		OutEdgeList eOut;
 	};
 	struct StoredVertexComplex : StoredVertexSimple {
-		OutEdgeList eIn;
+		InEdgeList eIn;
 	};
 
 	using StoredVertexT = std::conditional_t<
@@ -170,20 +171,21 @@ private:
 	EList eList;
 public:
 	struct OutEdgeRange {
+	public:
 		std::size_t s;
-		const AdjacencyList& parent;
+		const AdjacencyList* parent;
 
 		OutEdgeRange() {}
-		OutEdgeRange(std::size_t s, const AdjacencyList& parent) : s(s), parent(parent) {}
+		OutEdgeRange(std::size_t s, const AdjacencyList* parent) : s(s), parent(parent) {}
 		struct iterator;
 		iterator begin() {
-			return iterator(this->parent.vList.at(this->s).eOut, this);
+			return iterator(&this->parent->vList.at(this->s).eOut, this);
 		}
 		iterator end() {
-			return ++iterator(this->parent.vList.at(this->s).eOut, this, 0);
+			return ++iterator(&this->parent->vList.at(this->s).eOut, this, 0);
 		}
 		EdgeDescriptor create(std::size_t elst_idx) {
-			VertexDescriptor other = this->parent.eList.at(elst_idx).tar;
+			VertexDescriptor other = this->parent->eList.at(elst_idx).tar;
 			return EdgeDescriptor(this->s, other, elst_idx);
 		}
 
@@ -193,12 +195,12 @@ public:
 			using iterator_category = std::bidirectional_iterator_tag;
 			using difference_type = ptrdiff_t; //incorrect
 		
-			const OutEdgeList& p; //The list we iterate over
-			OutEdgeRange* r; //The parent
+			const OutEdgeList* p; //The list we iterate over
+			const OutEdgeRange* r; //The parent
 			std::size_t c; //The index
 
 			void increment() {
-				this->c = std::min(((std::size_t)c)+1, this->p.size()); //Goes 1 above
+				this->c = std::min(((std::size_t)c)+1, this->p->size()); //Goes 1 above
 			}
 			void decrement() {
 				this->c = std::max(((std::size_t)c)-1, std::size_t(0));
@@ -206,8 +208,8 @@ public:
 
 			//Iterator
 			iterator() : c(std::size_t(0)), p(nullptr) {}
-			iterator(const OutEdgeList& parent, OutEdgeRange* re) : r(re), c(std::size_t(0)), p(parent) {}
-			iterator(const OutEdgeList& parent, OutEdgeRange* re, int) : r(re), c(std::size_t(parent.size()-1)), p(parent) {}
+			iterator(const OutEdgeList* p, const OutEdgeRange* re) : r(re), c(std::size_t(0)), p(p) {}
+			iterator(const OutEdgeList* p, const OutEdgeRange* re, int) : r(re), c(std::size_t(p->size()-1)), p(p) {}
 
 			//Required for equality
 			//	struct std::common_reference<DM852::List<int>::iterator&, int&>
@@ -239,32 +241,32 @@ public:
 			}
 			//Dereference
 			reference operator*() {
-				std::size_t e = this->p.at(this->c);
-				return this->r->create(e);
+				std::size_t e = this->p->at(this->c);
+				return ((OutEdgeRange*)r)->create(e);
 			}
 			reference operator*() const {
-				std::size_t e = this->p.at(this->c);
-				return this->r->create(e);
+				std::size_t e = this->p->at(this->c);
+				return ((OutEdgeRange*)r)->create(e);
 			}
 		};
 	};
-	//Inherit bugged out for some reason, so copy it is (with some small changes)
+	//InEdgeRange is basically the same thing, with source and target switched
 	struct InEdgeRange {
 		std::size_t s;
-		const AdjacencyList& parent;
+		const AdjacencyList* parent;
 
 		InEdgeRange() {}
-		InEdgeRange(std::size_t s, const AdjacencyList& parent) : s(s), parent(parent) {}
+		InEdgeRange(std::size_t s, const AdjacencyList* parent) : s(s), parent(parent) {}
 		struct iterator;
 		iterator begin() {
-			return iterator(this->parent.vList.at(this->s).eIn, this);
+			return iterator(&this->parent->vList.at(this->s).eIn, this);
 		}
 		iterator end() {
-			return ++iterator(this->parent.vList.at(this->s).eIn, this, 0);
+			return ++iterator(&this->parent->vList.at(this->s).eIn, this, 0);
 		}
 		EdgeDescriptor create(std::size_t elst_idx) {
-			VertexDescriptor other = this->parent.eList.at(elst_idx).src;
-			return EdgeDescriptor(this->s, other, elst_idx);
+			VertexDescriptor other = this->parent->eList.at(elst_idx).src;
+			return EdgeDescriptor(other, this->s, elst_idx);
 		}
 
 		struct iterator {
@@ -273,12 +275,12 @@ public:
 			using iterator_category = std::bidirectional_iterator_tag;
 			using difference_type = ptrdiff_t; //incorrect
 		
-			const OutEdgeList& p;
-			InEdgeRange* r;
-			std::size_t c;
+			const InEdgeList* p; //The list we iterate over
+			const InEdgeRange* r; //The parent
+			std::size_t c; //The index
 
 			void increment() {
-				this->c = std::min(((std::size_t)c)+1, this->p.size()); //Goes 1 above
+				this->c = std::min(((std::size_t)c)+1, this->p->size()); //Goes 1 above
 			}
 			void decrement() {
 				this->c = std::max(((std::size_t)c)-1, std::size_t(0));
@@ -286,8 +288,8 @@ public:
 
 			//Iterator
 			iterator() : c(std::size_t(0)), p(nullptr) {}
-			iterator(const OutEdgeList& parent, InEdgeRange* re) : r(re), c(std::size_t(0)), p(parent) {}
-			iterator(const OutEdgeList& parent, InEdgeRange* re, int) : r(re), c(std::size_t(parent.size()-1)), p(parent) {}
+			iterator(const InEdgeList* p, const InEdgeRange* re) : r(re), c(std::size_t(0)), p(p) {}
+			iterator(const InEdgeList* p, const InEdgeRange* re, int) : r(re), c(std::size_t(p->size()-1)), p(p) {}
 
 			//Required for equality
 			//	struct std::common_reference<DM852::List<int>::iterator&, int&>
@@ -319,12 +321,12 @@ public:
 			}
 			//Dereference
 			reference operator*() {
-				std::size_t e = this->p.at(this->c);
-				return this->r->create(e);
+				std::size_t e = this->p->at(this->c);
+				return ((OutEdgeRange*)r)->create(e);
 			}
 			reference operator*() const {
-				std::size_t e = this->p.at(this->c);
-				return this->r->create(e);
+				std::size_t e = this->p->at(this->c);
+				return ((OutEdgeRange*)r)->create(e);
 			}
 		};
 	};
@@ -358,34 +360,22 @@ public: // Other
 	}
 public: // IncidenceGraph
 	friend OutEdgeRange outEdges(VertexDescriptor v, const AdjacencyList &g) {
-		return OutEdgeRange(v,g);
+		const AdjacencyList* _g = &g;
+		return OutEdgeRange(v,_g);
 	}
 	friend std::size_t outDegree(VertexDescriptor v, const AdjacencyList &g) {
-		std::size_t num = 0;
-		for (auto e : edges(g)) {
-			if (e.src == v) {
-				num++;
-			}
-		}
-		return num;
+		return g.vList.at(v).eOut.size();
 	}
 public: // BidirectionalGraph
-	friend InEdgeRange inEdges(VertexDescriptor v, const AdjacencyList &g) {
-		return InEdgeRange(v,g);
+	friend InEdgeRange inEdges(VertexDescriptor& v, const AdjacencyList &g) requires std::same_as<DirectedCategory, graph::tags::Bidirectional> {
+		const AdjacencyList* _g = &g;
+		return InEdgeRange(v,_g);
 	}
-	friend std::size_t inDegree(VertexDescriptor v, const AdjacencyList &g) {
-		std::size_t num = 0;
-		for (auto e : edges(g)) {
-			if (e.tar == v) {
-				num++;
-			}
-		}
-		return num;
+	friend std::size_t inDegree(VertexDescriptor& v, const AdjacencyList &g) requires std::same_as<DirectedCategory, graph::tags::Bidirectional> {
+		return g.vList.at(v).eIn.size();
 	}
 public: // MutableGraph
-	template<typename T, typename A, typename B>
-	friend VertexDescriptor addVertex(const AdjacencyList<T,A,B> &_g) requires std::default_initializable<A> {
-		AdjacencyList &g = (AdjacencyList&)_g;
+	friend VertexDescriptor addVertex(AdjacencyList &g) requires std::default_initializable<VertexProp> {
 		//Create an edge
 		StoredVertex e;
 		//Append to vertex list
@@ -393,9 +383,7 @@ public: // MutableGraph
 		//Return index
 		return g.vList.size()-1;
 	}
-	template<typename T, typename A, typename B>
-	friend VertexDescriptor addVertex(const VertexProp &prop, const AdjacencyList<T,A,B> &_g) requires std::default_initializable<A> {
-		AdjacencyList &g = (AdjacencyList&)_g;
+	friend VertexDescriptor addVertex(const VertexProp &prop, AdjacencyList &g) requires (!std::same_as<VertexProp, NoProp>) {
 		//Create an edge
 		StoredVertex e;
 		e.prop = prop;
@@ -405,9 +393,7 @@ public: // MutableGraph
 		return g.vList.size()-1;
 	}
 	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, const AdjacencyList<T,A,B> &_g) requires std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
-		AdjacencyList &g = (AdjacencyList&)_g;
-
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, AdjacencyList<T,A,B> &g) requires (!std::same_as<A, NoProp>) && std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
 		//Create an edge
 		StoredEdge e;
 		e.src = u;
@@ -419,16 +405,14 @@ public: // MutableGraph
 		auto idx = g.eList.size()-1;
 
 		//Add edge to u's outedges
-		std::vector<std::size_t>& ul = g.vList->at(u).eOut;
+		std::vector<std::size_t>& ul = g.vList.at(u).eOut;
 		ul.push_back(idx);
 
 		//Return descriptor
 		return EdgeDescriptor(u,v,idx);
 	}
 	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const AdjacencyList<T,A,B> &_g) requires std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
-		AdjacencyList &g = (AdjacencyList&)_g;
-
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList<T,A,B> &g) requires std::same_as<T, graph::tags::Directed> && std::default_initializable<B> {
 		//Create an edge
 		StoredEdge e;
 		e.src = u;
@@ -446,9 +430,7 @@ public: // MutableGraph
 		return EdgeDescriptor(u,v,idx);
 	}
 	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, const AdjacencyList<T,A,B> &_g) requires std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
-		AdjacencyList &g = (AdjacencyList&)_g;
-
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const EdgeProp &prop, AdjacencyList<T,A,B> &g) requires (!std::same_as<A, NoProp>) && std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
 		//Create an edge
 		StoredEdge e;
 		e.src = u;
@@ -471,9 +453,7 @@ public: // MutableGraph
 		return EdgeDescriptor(u,v,idx);
 	}
 	template<typename T, typename A, typename B>
-	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, const AdjacencyList<T,A,B> &_g) requires std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
-		AdjacencyList &g = (AdjacencyList&)_g;
-
+	friend EdgeDescriptor addEdge(const VertexDescriptor u, const VertexDescriptor v, AdjacencyList<T,A,B> &g) requires std::same_as<T, graph::tags::Bidirectional> && std::default_initializable<B> {
 		//Create an edge
 		StoredEdge e;
 		e.src = u;
@@ -495,7 +475,6 @@ public: // MutableGraph
 		return EdgeDescriptor(u,v,idx);
 	}
 public: // MutablePropertyGraph
-	// TODO
 public: // PropertyGraph
 	VertexProp& operator[](VertexDescriptor e) {
 		return vList.at(e).prop;

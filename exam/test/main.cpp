@@ -25,7 +25,7 @@ void mutgraph_test(Graph& e) requires graph::MutableGraph<Graph> {
 	addEdge(v5,v6,50,e);
 }
 template<typename Graph>
-void incgraph_test(Graph& e) { //requires graph::IncidenceGraph<Graph> {
+void incgraph_test(Graph& e) requires graph::IncidenceGraph<Graph> {
 	std::cout << "incgraph_test" << std::endl;
 	//TODO: Some invalid parameter Range R void in Range
 	for (auto v : vertices(e)) {
@@ -39,7 +39,7 @@ void incgraph_test(Graph& e) { //requires graph::IncidenceGraph<Graph> {
 }
 
 template<typename Graph>
-void bigraph_test(Graph& e) { // requires graph::BidirectionalGraph<Graph> {
+void bigraph_test(Graph& e) requires graph::BidirectionalGraph<Graph> {
 	std::cout << "bigraph_test" << std::endl;
 	for (auto v : vertices(e)) {
 		std::cout << "Vertex: " << v << std::endl;
@@ -85,9 +85,19 @@ void topograph_test(Graph& g) {
 	std::reverse(vs.begin(), vs.end());
 }
 
-int main() {
-	graph::AdjacencyList<graph::tags::Bidirectional, int, int> e;
+void directed() {
+	graph::AdjacencyList<graph::tags::Directed, int, int> e;
 
+	graph_test(e);
+	mutgraph_test(e);
+	incgraph_test(e);
+	propgraph_test(e);
+	mutpropgraph_test(e);
+	dfsgraph_test(e);
+	topograph_test(e);
+}
+void bidirection() {
+	graph::AdjacencyList<graph::tags::Bidirectional, int, int> e;
 	graph_test(e);
 	mutgraph_test(e);
 	incgraph_test(e);
@@ -96,4 +106,9 @@ int main() {
 	mutpropgraph_test(e);
 	dfsgraph_test(e);
 	topograph_test(e);
+}
+
+int main() {
+	directed();
+	bidirection();
 }
