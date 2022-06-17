@@ -98,6 +98,19 @@ void directed() {
 }
 void bidirection() {
 	graph::AdjacencyList<graph::tags::Bidirectional, int, int> e;
+
+	graph_test(e);
+	mutgraph_test(e);
+	incgraph_test(e);
+	bigraph_test(e);
+	propgraph_test(e);
+	mutpropgraph_test(e);
+	dfsgraph_test(e);
+	topograph_test(e);
+}
+void bidirection() {
+	graph::AdjacencyList<graph::tags::Bidirectional, int, int> e;
+
 	graph_test(e);
 	mutgraph_test(e);
 	incgraph_test(e);
@@ -108,44 +121,7 @@ void bidirection() {
 	topograph_test(e);
 }
 
-template<typename Graph>
-void mutgraph_test_noprop(Graph& e) requires graph::MutableGraph<Graph> {
-	std::cout << "mutgraph_test" << std::endl;
-	auto v1 = addVertex(e);
-
-	auto v2 = addVertex(e);
-	addEdge(v1,v2,e); //Technically property graph, meh
-	auto v3 = addVertex(e);
-	addEdge(v2,v3,e);
-	auto v4 = addVertex(e);
-	addEdge(v3,v4,e);
-	auto v5 = addVertex(e);
-	addEdge(v4,v5,e);
-	auto v6 = addVertex(e);
-	addEdge(v5,v6,e);
-}
-void bidirection_noprop() {
-	graph::AdjacencyList<graph::tags::Bidirectional> e;
-	graph_test(e);
-	mutgraph_test_noprop(e);
-	incgraph_test(e);
-	bigraph_test(e);
-	dfsgraph_test(e);
-	topograph_test(e);
-}
-void direction_noprop() {
-	graph::AdjacencyList<graph::tags::Directed> e;
-	graph_test(e);
-	mutgraph_test_noprop(e);
-	incgraph_test(e);
-	dfsgraph_test(e);
-	topograph_test(e);
-}
-
-
 int main() {
 	directed();
 	bidirection();
-	bidirection_noprop();
-	direction_noprop();
 }

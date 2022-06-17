@@ -196,7 +196,7 @@ public:
 			using difference_type = ptrdiff_t; //incorrect
 		
 			const OutEdgeList* p; //The list we iterate over
-			const OutEdgeRange* r; //The parent
+			OutEdgeRange* r; //The parent
 			std::size_t c; //The index
 
 			void increment() {
@@ -208,8 +208,8 @@ public:
 
 			//Iterator
 			iterator() : c(std::size_t(0)), p(nullptr) {}
-			iterator(const OutEdgeList* p, const OutEdgeRange* re) : r(re), c(std::size_t(0)), p(p) {}
-			iterator(const OutEdgeList* p, const OutEdgeRange* re, int) : r(re), c(std::size_t(p->size()-1)), p(p) {}
+			iterator(const OutEdgeList* p, OutEdgeRange* re) : r(re), c(std::size_t(0)), p(p) {}
+			iterator(const OutEdgeList* p, OutEdgeRange* re, int) : r(re), c(std::size_t(p->size()-1)), p(p) {}
 
 			//Required for equality
 			//	struct std::common_reference<DM852::List<int>::iterator&, int&>
@@ -242,11 +242,11 @@ public:
 			//Dereference
 			reference operator*() {
 				std::size_t e = this->p->at(this->c);
-				return ((OutEdgeRange*)r)->create(e);
+				return r->create(e);
 			}
 			reference operator*() const {
 				std::size_t e = this->p->at(this->c);
-				return ((OutEdgeRange*)r)->create(e);
+				return r->create(e);
 			}
 		};
 	};
@@ -322,11 +322,11 @@ public:
 			//Dereference
 			reference operator*() {
 				std::size_t e = this->p->at(this->c);
-				return ((OutEdgeRange*)r)->create(e);
+				return ((InEdgeRange*)r)->create(e);
 			}
 			reference operator*() const {
 				std::size_t e = this->p->at(this->c);
-				return ((OutEdgeRange*)r)->create(e);
+				return ((InEdgeRange*)r)->create(e);
 			}
 		};
 	};
@@ -394,7 +394,7 @@ public: // MutableGraph
 		auto idx = g.eList.size()-1;
 
 		//Add edge to u's outedges
-		std::vector<std::size_t>& ul = g.vList->at(u).eOut;
+		std::vector<std::size_t>& ul = g.vList.at(u).eOut;
 		ul.push_back(idx);
 
 		//Return descriptor
