@@ -194,7 +194,7 @@ public:
 			using reference = value_type;
 			using iterator_category = std::bidirectional_iterator_tag;
 			using difference_type = ptrdiff_t; //incorrect
-		
+	
 			const OutEdgeList* p; //The list we iterate over
 			OutEdgeRange* r; //The parent
 			std::size_t c; //The index
