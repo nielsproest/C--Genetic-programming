@@ -251,13 +251,10 @@ public:
 		};
 	};
 	//InEdgeRange is basically the same thing, with source and target switched
-	struct InEdgeRange {
-		std::size_t s;
-		const AdjacencyList* parent;
-
+	struct InEdgeRange : OutEdgeRange {
 		InEdgeRange() {}
-		InEdgeRange(std::size_t s, const AdjacencyList* parent) : s(s), parent(parent) {}
-		struct iterator;
+		InEdgeRange(std::size_t s, const AdjacencyList* parent) : OutEdgeRange(s, parent) {}
+		using iterator = OutEdgeRange::iterator;
 		iterator begin() {
 			return iterator(&this->parent->vList.at(this->s).eIn, this);
 		}
@@ -268,67 +265,6 @@ public:
 			VertexDescriptor other = this->parent->eList.at(elst_idx).src;
 			return EdgeDescriptor(other, this->s, elst_idx);
 		}
-
-		struct iterator {
-			using value_type = EdgeDescriptor;
-			using reference = value_type;
-			using iterator_category = std::bidirectional_iterator_tag;
-			using difference_type = ptrdiff_t; //incorrect
-		
-			const InEdgeList* p; //The list we iterate over
-			const InEdgeRange* r; //The parent
-			std::size_t c; //The index
-
-			void increment() {
-				this->c = std::min(((std::size_t)c)+1, this->p->size()); //Goes 1 above
-			}
-			void decrement() {
-				this->c = std::max(((std::size_t)c)-1, std::size_t(0));
-			}
-
-			//Iterator
-			iterator() : c(std::size_t(0)), p(nullptr) {}
-			iterator(const InEdgeList* p, const InEdgeRange* re) : r(re), c(std::size_t(0)), p(p) {}
-			iterator(const InEdgeList* p, const InEdgeRange* re, int) : r(re), c(std::size_t(p->size()-1)), p(p) {}
-
-			//Required for equality
-			//	struct std::common_reference<DM852::List<int>::iterator&, int&>
-			operator int&() const {
-				return (int&)c;
-			}
-
-			//Pre-increment
-			iterator& operator++() {
-				this->increment();
-				return *this;
-			}
-			//Pre-decrement
-			iterator& operator--() {
-				this->decrement();
-				return *this;
-			}
-			//Post-increment
-			iterator operator++(int) {
-				iterator V(this->c, this->p);
-				this->increment();
-				return V;
-			}
-			//Post-decrement
-			iterator operator--(int) {
-				iterator V(this->c, this->p);
-				this->decrement();
-				return V;
-			}
-			//Dereference
-			reference operator*() {
-				std::size_t e = this->p->at(this->c);
-				return ((InEdgeRange*)r)->create(e);
-			}
-			reference operator*() const {
-				std::size_t e = this->p->at(this->c);
-				return ((InEdgeRange*)r)->create(e);
-			}
-		};
 	};
 public: // Graph
 	friend VertexDescriptor source(EdgeDescriptor e, const AdjacencyList &g) {
